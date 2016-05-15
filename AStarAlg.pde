@@ -3,7 +3,6 @@ import java.util.ArrayList;
 class AStarAlg extends Alg {
   BinaryHeap open;
   ArrayList<Integer> closed = new ArrayList<Integer>();
-  ArrayList<Integer> path = new ArrayList<Integer>();
 
   AStarAlg(Board board) {
     this.board = board;
@@ -12,14 +11,20 @@ class AStarAlg extends Alg {
   void init() {
     super.init();
     open = new BinaryHeap(board);
-    path.clear();
+    for(int node : closed) {
+      board.grab(node).open = true;
+    }
     closed.clear();
+    open = new BinaryHeap(board);
+    travel = false;
   }
 
   void go() {  //really listen() for manual keyboard controls
     if (run) {
-      if (!travel) calc();
-      else travel(path);
+      if (!travel) {
+        calc();
+      }
+      travel(closed);
     }
   }
 
@@ -27,16 +32,19 @@ class AStarAlg extends Alg {
     int bNode = board.start.id;
     open.add(bNode, bNode);
     //while (x != endX || y != endY) {
-    for(int s = 0; s < 10; s++) {
-      //Implement A* here
-      open.add(board.openNeighbors(board.grab(x, y).id), bNode);
+    for (int z = 0; z < 10; z++) {
+      bNode = open.getMQ();
+      board.grab(bNode).open = false;
+      closed.add(bNode);
+      open.add(board.openNeighbors(bNode), bNode);
+      //System.out.println(bNode + " " + open);
     }
-    System.out.println(open);
     travel = true;
   }
 
   void travel(ArrayList<Integer> pathF) {
-    if (iterator < pathF.size() && millis() > time + 20) {  //makes sure iterator doesn't go out of bounds and that x ms has passed
+    //System.out.println(iterator + " " + pathF.size());
+    if (iterator < pathF.size() && millis() > time + 50) {  //makes sure iterator doesn't go out of bounds and that x ms has passed
       time = millis();
       x = board.grab(pathF.get(iterator)).xi;  //Updates coordinate values
       y = board.grab(pathF.get(iterator)).yi;
@@ -54,6 +62,14 @@ class AStarAlg extends Alg {
       steps++;  //Iterates
       iterator++;
     }
+  }
+}
+
+class Holder {
+  ArrayList<Integer> path;
+  
+  Holder() {
+    path = new ArrayList<Integer>();
   }
 }
 
@@ -84,15 +100,17 @@ class BinaryHeap {
 
   int getMQ() {  //Most Qualified
     int mq = heap.remove(1);
-    double c1 = board.grab(heap.get(1)).fScore();  //Successor
-    int curPos = 1;
-    while ((heap.get(curPos*2) != null || heap.get(curPos*2+1) != null) && (c1 > board.grab(heap.get(curPos*2)).fScore() || c1 > board.grab(heap.get(curPos*2+1)).fScore())) {
-      if (heap.get(curPos*2 + 1) == null || board.grab(heap.get(curPos*2)).fScore() < board.grab(heap.get(curPos*2+1)).fScore()) {
-        Collections.swap(heap, curPos, curPos*2);
-        curPos *= 2;
-      } else {
-        Collections.swap(heap, curPos, curPos*2+1);
-        curPos = curPos * 2 + 1;
+    if (heap.size()>1) {
+      double c1 = board.grab(heap.get(1)).fScore();  //Successor
+      int curPos = 1;
+      while ((curPos*2 < heap.size() && (c1 > board.grab(heap.get(curPos*2)).fScore())) || ((curPos*2+1 < heap.size()) && c1 > board.grab(heap.get(curPos*2+1)).fScore())) {
+        if (curPos*2 + 1 >= heap.size() || board.grab(heap.get(curPos*2)).fScore() < board.grab(heap.get(curPos*2+1)).fScore()) {
+          Collections.swap(heap, curPos, curPos*2);
+          curPos *= 2;
+        } else {
+          Collections.swap(heap, curPos, curPos*2+1);
+          curPos = curPos * 2 + 1;
+        }
       }
     }
     return mq;

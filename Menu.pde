@@ -1,6 +1,6 @@
 class Menu {
   float x, y, padding = 15, innerPadding = 10;
-  int sizeX, sizeY;
+  int sizeX, sizeY, time;
   int bh; //height of all buttons
   Board board;
   Alg alg;
@@ -13,6 +13,7 @@ class Menu {
     this.board = board;
     alg = algorithm;
     bh = buttonHeight;
+    time = millis();
   }
 
   void display() {
@@ -152,7 +153,8 @@ class Menu {
 
     if (mouseX > x + padding && mouseX < x + sizeX/2 && mouseY > y + bh*3 + padding*4 && mouseY < y + (bh + padding) * 4) { //Sixth Button
       drawB6(true);
-      if (mousePressed) {
+      if (mousePressed && millis() > time + 500) {
+        time = millis();
         if (board.start != null && board.end != null) alg.play();
       }
     } else drawB6(false);
