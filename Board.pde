@@ -20,6 +20,10 @@ class Board {
       }
     }
   }
+  
+  double nodeDist(int a, int b) {
+    return Math.sqrt(Math.abs(grab(a).xi-grab(b).xi)*Math.abs(grab(a).xi-grab(b).xi) + Math.abs(grab(a).yi-grab(b).yi)*Math.abs(grab(a).yi-grab(b).yi));
+  }
 
   void drawWall() {
     draw = 0;
@@ -120,8 +124,8 @@ class Board {
 
 class Cell {
   float x, y;
-  double f;
   int xi, yi, size, id;  //xi and yi are board indices
+  double f;
   boolean visited = false, wall = false, start = false, end = false, on = false, open = true;
 
   Cell(float x, float y, int px, int xi, int yi, int i) {
@@ -131,6 +135,10 @@ class Cell {
     this.yi = yi;
     id = i;
     size = px;
+  }
+  
+  void calcFScore(int b, int e) {
+    f = board.nodeDist(id,b) + board.nodeDist(id, e);
   }
   
   double fScore() {

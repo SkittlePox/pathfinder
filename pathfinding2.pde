@@ -2,7 +2,6 @@ Board board;
 Menu menu;
 Alg manual, astar;
 int gridX = 25, gridY = 25, px = 25, offset = (700 - gridY * px) / 2;  //px is side of each cell, offset is space to the left of board
-boolean tt = false;
 
 void setup() {
   fill(255, 227, 159);
@@ -22,10 +21,6 @@ void draw() {
   menu.listen();
   menu.drawAlgStatus();
   astar.go();
-  //if(tt!= astar.travel) {
-  //  System.out.println(astar.travel);
-  //  tt = astar.travel;
-  //}
 }
 
 void keyPressed() {

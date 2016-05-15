@@ -7,14 +7,11 @@ class AStarAlg extends Alg {
 
   AStarAlg(Board board) {
     this.board = board;
-    open = new BinaryHeap(board);
-    open.add(-1);
-    //for (int i = 0; i < 625; i++) path.add(i);
   }
 
   void init() {
     super.init();
-    open.clear();
+    open = new BinaryHeap(board);
     path.clear();
     closed.clear();
   }
@@ -27,11 +24,14 @@ class AStarAlg extends Alg {
   }
 
   void calc() {  //Main A* alg
-    //path.add(board.start.id);
-    open.add(board.start.id);
+    int bNode = board.start.id;
+    open.add(bNode, bNode);
     //while (x != endX || y != endY) {
-    open.add(board.openNeighbors(board.grab(x, y).id));
-    //}
+    for(int s = 0; s < 10; s++) {
+      //Implement A* here
+      open.add(board.openNeighbors(board.grab(x, y).id), bNode);
+    }
+    System.out.println(open);
     travel = true;
   }
 
@@ -61,28 +61,33 @@ import java.util.Collections;
 
 class BinaryHeap {
   Board board;
+  int end;
   ArrayList<Integer> heap = new ArrayList<Integer>();
 
   BinaryHeap(Board board) {
     heap.add(-1);
+    end = board.end.id;
     this.board = board;
   }
 
-  void add(int n) {
-    heap.add(n);
-    int curPos = heap.size()-1;
-    while (board.grab(heap.get(curPos/2)).fScore() > board.grab(n).fScore()) {
-      Collections.swap(heap, curPos/2, curPos);
-      curPos /= 2;
+  void add(int n, int b) {
+    if (!heap.contains(n)) {
+      heap.add(n);
+      board.grab(n).calcFScore(b, end);
+      int curPos = heap.size()-1;
+      while (curPos/2 != 0 && board.grab(heap.get(curPos/2)).fScore() > board.grab(n).fScore()) {
+        Collections.swap(heap, curPos/2, curPos);
+        curPos /= 2;
+      }
     }
   }
 
   int getMQ() {  //Most Qualified
     int mq = heap.remove(1);
-    int c1 = heap.get(1);  //Successor
+    double c1 = board.grab(heap.get(1)).fScore();  //Successor
     int curPos = 1;
-    while ((heap.get(curPos*2) != null || heap.get(curPos*2+1) != null) && (c1 > heap.get(curPos*2) || c1 > heap.get(curPos*2+1))) {
-      if (heap.get(curPos*2 + 1) == null || heap.get(curPos*2) < heap.get(curPos*2+1)) {
+    while ((heap.get(curPos*2) != null || heap.get(curPos*2+1) != null) && (c1 > board.grab(heap.get(curPos*2)).fScore() || c1 > board.grab(heap.get(curPos*2+1)).fScore())) {
+      if (heap.get(curPos*2 + 1) == null || board.grab(heap.get(curPos*2)).fScore() < board.grab(heap.get(curPos*2+1)).fScore()) {
         Collections.swap(heap, curPos, curPos*2);
         curPos *= 2;
       } else {
@@ -93,13 +98,8 @@ class BinaryHeap {
     return mq;
   }
 
-  void add(ArrayList<Integer> ns) {
-    for (Integer n : ns) add(n);
-  }
-
-  void clear() {
-    heap.clear();
-    heap.add(-1);
+  void add(ArrayList<Integer> ns, int b) {
+    for (Integer n : ns) add(n, b);
   }
 
   ArrayList<Integer> getHeap() {
