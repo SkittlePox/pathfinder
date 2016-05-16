@@ -11,7 +11,7 @@ class AStarAlg extends Alg {
   void init() {
     super.init();
     open = new BinaryHeap(board);
-    for(int node : closed) {
+    for (int node : closed) {
       board.grab(node).open = true;
     }
     closed.clear();
@@ -31,20 +31,20 @@ class AStarAlg extends Alg {
   void calc() {  //Main A* alg
     int bNode = board.start.id;
     open.add(bNode, bNode);
-    //while (x != endX || y != endY) {
-    for (int z = 0; z < 10; z++) {
+    for (int z = 0; z < board.x*board.y/2; z++) {
       bNode = open.getMQ();
+      if(bNode == -1) break;
       board.grab(bNode).open = false;
       closed.add(bNode);
+      if (bNode == board.end.id) break;
       open.add(board.openNeighbors(bNode), bNode);
-      //System.out.println(bNode + " " + open);
+      System.out.println(open);
     }
     travel = true;
   }
 
   void travel(ArrayList<Integer> pathF) {
-    //System.out.println(iterator + " " + pathF.size());
-    if (iterator < pathF.size() && millis() > time + 50) {  //makes sure iterator doesn't go out of bounds and that x ms has passed
+    if (iterator < pathF.size() && millis() > time + 20) {  //makes sure iterator doesn't go out of bounds and that x ms has passed
       time = millis();
       x = board.grab(pathF.get(iterator)).xi;  //Updates coordinate values
       y = board.grab(pathF.get(iterator)).yi;
@@ -62,14 +62,6 @@ class AStarAlg extends Alg {
       steps++;  //Iterates
       iterator++;
     }
-  }
-}
-
-class Holder {
-  ArrayList<Integer> path;
-  
-  Holder() {
-    path = new ArrayList<Integer>();
   }
 }
 
@@ -99,17 +91,20 @@ class BinaryHeap {
   }
 
   int getMQ() {  //Most Qualified
-    int mq = heap.remove(1);
-    if (heap.size()>1) {
-      double c1 = board.grab(heap.get(1)).fScore();  //Successor
-      int curPos = 1;
-      while ((curPos*2 < heap.size() && (c1 > board.grab(heap.get(curPos*2)).fScore())) || ((curPos*2+1 < heap.size()) && c1 > board.grab(heap.get(curPos*2+1)).fScore())) {
-        if (curPos*2 + 1 >= heap.size() || board.grab(heap.get(curPos*2)).fScore() < board.grab(heap.get(curPos*2+1)).fScore()) {
-          Collections.swap(heap, curPos, curPos*2);
-          curPos *= 2;
-        } else {
-          Collections.swap(heap, curPos, curPos*2+1);
-          curPos = curPos * 2 + 1;
+    int mq = -1;
+    if (heap.size()!=1) {
+      mq = heap.remove(1);
+      if (heap.size()>1) {
+        double c1 = board.grab(heap.get(1)).fScore();  //Successor
+        int curPos = 1;
+        while ((curPos*2 < heap.size() && (c1 > board.grab(heap.get(curPos*2)).fScore())) || ((curPos*2+1 < heap.size()) && c1 > board.grab(heap.get(curPos*2+1)).fScore())) {
+          if (curPos*2 + 1 >= heap.size() || board.grab(heap.get(curPos*2)).fScore() < board.grab(heap.get(curPos*2+1)).fScore()) {
+            Collections.swap(heap, curPos, curPos*2);
+            curPos *= 2;
+          } else {
+            Collections.swap(heap, curPos, curPos*2+1);
+            curPos = curPos * 2 + 1;
+          }
         }
       }
     }

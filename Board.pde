@@ -1,5 +1,6 @@
 class Board {
   Cell[][] grid;
+  ArrayList<Cell> cells;
   Cell start, end;
   int pxsize, offset;
   int x, y;
@@ -7,6 +8,7 @@ class Board {
 
   Board(int x, int y, int size, int offset) {
     grid = new Cell[x][y];
+    cells = new ArrayList<Cell>();
     this.x = x;
     this.y = y;
     pxsize = size;
@@ -15,12 +17,13 @@ class Board {
     int id = 0;
     for (int i = 0; i < grid.length; i++) {
       for (int j = 0; j < grid[i].length; j++) {
-        grid[i][j] = new Cell(i * pxsize + offset, j * pxsize + offset, pxsize, i, j, id);
+        grid[i][j] = new Cell(j * pxsize + offset, i * pxsize + offset, pxsize, j, i, id);
+        cells.add(grid[i][j]);
         id++;
       }
     }
   }
-  
+
   double nodeDist(int a, int b) {
     return Math.sqrt(Math.abs(grab(a).xi-grab(b).xi)*Math.abs(grab(a).xi-grab(b).xi) + Math.abs(grab(a).yi-grab(b).yi)*Math.abs(grab(a).yi-grab(b).yi));
   }
@@ -71,7 +74,7 @@ class Board {
   void display() {
     for (int i = 0; i < grid.length; i++) {
       for (int j = 0; j < grid[i].length; j++) {
-        grid[i][j].display();
+        grid[j][i].display();
       }
     }
   }
@@ -79,8 +82,11 @@ class Board {
   void clearAllExceptWalls() {
     for (int i = 0; i < board.x; i++) {
       for (int x = 0; x < board.y; x++) {
-        grid[i][x].visited = false;
-        grid[i][x].on = false;
+        if (!grid[i][x].wall) {
+          grid[i][x].visited = false;
+          grid[i][x].open = true;
+          grid[i][x].on = false;
+        }
       }
     }
     display();
@@ -90,6 +96,7 @@ class Board {
     for (int i = 0; i < board.x; i++) {
       for (int x = 0; x < board.y; x++) {
         grid[i][x].wall = false;
+        grid[i][x].open = true;
         grid[i][x].visited = false;
         grid[i][x].on = false;
       }
@@ -102,22 +109,21 @@ class Board {
   }
 
   Cell grab(int id) {
-    return grid[id%x][id/y];
+    return cells.get(id);
   }
 
   ArrayList<Integer> openNeighbors(int id) {
     ArrayList<Integer> neighbors = new ArrayList<Integer>();
-    int tempX = grab(id).xi, tempY = grab(id).yi;
+    int tempX = grab(id).yi, tempY = grab(id).xi;
     for (int i = tempX-1; i <= tempX+1; i++) {
-      if (i>=0 && i<x) {
-        for (int j = tempY-1; j <= tempY+1; j++) {
-          if (j>=0 && j<y) {
-            if ((i != tempX || j != tempY)) neighbors.add(grab(i, j).id);
+      for (int j = tempY-1; j <= tempY+1; j++) {
+        if (j>=0 && j<y && i>=0 && i<x) {
+          if ((j != tempY || i != tempX) && grab(i, j).open && !grab(i, j).wall) {
+            neighbors.add(grab(i, j).id);
           }
         }
       }
     }
-
     return neighbors;
   }
 }
@@ -136,11 +142,11 @@ class Cell {
     id = i;
     size = px;
   }
-  
+
   void calcFScore(int b, int e) {
-    f = board.nodeDist(id,b) + board.nodeDist(id, e);
+    f = board.nodeDist(id, b) + board.nodeDist(id, e);
   }
-  
+
   double fScore() {
     return f;
   }
@@ -154,6 +160,10 @@ class Cell {
     else if (visited) fill(255, 255, 0);
     else fill(255);
     rect(x, y, size, size);
+    //textSize(12);
+    //fill(127);
+    //text(id, x, y + size);
+    //textSize(32);
   }
 
   int listen(int draw) {
