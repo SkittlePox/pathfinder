@@ -3,6 +3,7 @@ import java.util.ArrayList;
 class AStarAlg extends Alg {
   BinaryHeap open;
   ArrayList<Integer> closed = new ArrayList<Integer>();
+  ArrayList<Integer> path = new ArrayList<Integer>();
 
   AStarAlg(Board board) {
     this.board = board;
@@ -15,6 +16,7 @@ class AStarAlg extends Alg {
       board.grab(node).open = true;
     }
     closed.clear();
+    path.clear();
     open = new BinaryHeap(board);
     travel = false;
   }
@@ -24,7 +26,7 @@ class AStarAlg extends Alg {
       if (!travel) {
         calc();
       }
-      travel(closed);
+      travel(path);
     }
   }
 
@@ -33,13 +35,19 @@ class AStarAlg extends Alg {
     open.add(bNode, bNode);
     for (int z = 0; z < board.x*board.y/2; z++) {
       bNode = open.getMQ();
-      if(bNode == -1) break;
+      if (bNode == -1) break;
       board.grab(bNode).open = false;
       closed.add(bNode);
       if (bNode == board.end.id) break;
       open.add(board.openNeighbors(bNode), bNode);
-      System.out.println(open);
     }
+
+    int curNode = board.end.id;
+    while(curNode != board.start.id) {
+      path.add(0, curNode);
+      curNode = board.grab(curNode).parent;
+    }
+    
     travel = true;
   }
 
@@ -82,10 +90,24 @@ class BinaryHeap {
     if (!heap.contains(n)) {
       heap.add(n);
       board.grab(n).calcFScore(b, end);
+      board.grab(n).parent = b;
       int curPos = heap.size()-1;
       while (curPos/2 != 0 && board.grab(heap.get(curPos/2)).fScore() > board.grab(n).fScore()) {
         Collections.swap(heap, curPos/2, curPos);
         curPos /= 2;
+      }
+    } else {
+      double preScore = board.grab(n).fScore();
+      if (board.grab(n).calcFScore(b, end) < preScore) {
+        board.grab(n).parent = b;
+        int curPos = heap.indexOf(n);
+        double c1 = board.grab(n).fScore();
+
+        while (curPos != 1 && board.grab(heap.get(curPos/2)).fScore() > c1) {
+          Collections.swap(heap, curPos, curPos/2);
+        }
+      } else {
+        board.grab(n).f = preScore;
       }
     }
   }

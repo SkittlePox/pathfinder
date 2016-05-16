@@ -130,7 +130,7 @@ class Board {
 
 class Cell {
   float x, y;
-  int xi, yi, size, id;  //xi and yi are board indices
+  int xi, yi, size, id, parent;  //xi and yi are board indices
   double f;
   boolean visited = false, wall = false, start = false, end = false, on = false, open = true;
 
@@ -141,10 +141,12 @@ class Cell {
     this.yi = yi;
     id = i;
     size = px;
+    parent = -1;
   }
 
-  void calcFScore(int b, int e) {
+  double calcFScore(int b, int e) {
     f = board.nodeDist(id, b) + board.nodeDist(id, e);
+    return f;
   }
 
   double fScore() {
