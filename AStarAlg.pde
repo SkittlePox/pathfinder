@@ -26,14 +26,14 @@ class AStarAlg extends Alg {
       if (!travel) {
         calc();
       }
-      travel(path);
+      if(pathExists) travel(closed);
     }
   }
 
   void calc() {  //Main A* alg
     int bNode = board.start.id;
     open.add(bNode, bNode);
-    for (int z = 0; z < board.x*board.y/2; z++) {
+    for (int z = 0; z < board.x*board.y; z++) {
       bNode = open.getMQ();
       if (bNode == -1) break;
       board.grab(bNode).open = false;
@@ -43,11 +43,14 @@ class AStarAlg extends Alg {
     }
 
     int curNode = board.end.id;
-    while(curNode != board.start.id) {
-      path.add(0, curNode);
-      curNode = board.grab(curNode).parent;
+    if (board.end.parent != -1) {
+      while (curNode != board.start.id) {
+        path.add(0, curNode);
+        curNode = board.grab(curNode).parent;
+      }
+      pathExists = true;
     }
-    
+
     travel = true;
   }
 

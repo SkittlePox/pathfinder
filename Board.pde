@@ -86,6 +86,7 @@ class Board {
           grid[i][x].visited = false;
           grid[i][x].open = true;
           grid[i][x].on = false;
+          grid[i][x].parent = -1;
         }
       }
     }
@@ -99,6 +100,7 @@ class Board {
         grid[i][x].open = true;
         grid[i][x].visited = false;
         grid[i][x].on = false;
+        grid[i][x].parent = -1;
       }
     }
     display();
@@ -113,17 +115,41 @@ class Board {
   }
 
   ArrayList<Integer> openNeighbors(int id) {
+
     ArrayList<Integer> neighbors = new ArrayList<Integer>();
     int tempX = grab(id).yi, tempY = grab(id).xi;
-    for (int i = tempX-1; i <= tempX+1; i++) {
-      for (int j = tempY-1; j <= tempY+1; j++) {
-        if (j>=0 && j<y && i>=0 && i<x) {
-          if ((j != tempY || i != tempX) && grab(i, j).open && !grab(i, j).wall && grab(i, j).open) {
-            neighbors.add(grab(i, j).id);
-          }
-        }
+    boolean n = false, e = false, s = false, w = false;
+
+    for (int i = -1; i <= 1; i+=2) {
+      if (tempX+i >= 0 && tempX+i < x && !grab(tempX+i, tempY).wall) {
+        if (grab(tempX+i, tempY).open) neighbors.add(grab(tempX+i, tempY).id);
+        if (i == -1) w = true;
+        if (i == 1) e = true;
+      }
+      if (tempY+i >= 0 && tempY+i < y && !grab(tempX, tempY+i).wall) {
+        if (grab(tempX, tempY+i).open) neighbors.add(grab(tempX, tempY+i).id);
+        if (i == -1) n = true;
+        if (i == 1) s = true;
       }
     }
+
+    if (n) {
+      if (w && !grab(tempX-1, tempY-1).wall && grab(tempX-1, tempY-1).open) {
+        neighbors.add(grab(tempX-1, tempY-1).id);
+      }
+      if (e && !grab(tempX+1, tempY-1).wall && grab(tempX+1, tempY-1).open) {
+        neighbors.add(grab(tempX+1, tempY-1).id);
+      }
+    }
+    if (s) {
+      if (w && !grab(tempX-1, tempY+1).wall && grab(tempX-1, tempY+1).open) {
+        neighbors.add(grab(tempX-1, tempY+1).id);
+      }
+      if (e && !grab(tempX+1, tempY+1).wall && grab(tempX+1, tempY+1).open) {
+        neighbors.add(grab(tempX+1, tempY+1).id);
+      }
+    }
+    
     return neighbors;
   }
 }
@@ -171,27 +197,34 @@ class Cell {
   int listen(int draw) {
     int newStatus = 0;
     if (mouseX > x && mouseX < x + size && mouseY > y && mouseY < y + size && mousePressed) {
+      if (mouseButton == RIGHT) {
+        draw = 1;
+      }
       if (draw == 0) {
         wall = true;
         start = false;
         end = false;
         open = false;
+        visited = false;
       } else if (draw == 1) {
         wall = false;
         start = false;
         end = false;
         open = true;
+        visited = false;
       } else if (draw == 2) {
         wall = false;
         end = false;
         start = true;
         open = true;
+        visited = false;
         newStatus = 1;
       } else if (draw == 3) {
         wall = false;
         start = false;
         end = true;
         open = true;
+        visited = false;
         newStatus = 2;
       }
       display();

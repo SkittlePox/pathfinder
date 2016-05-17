@@ -1,7 +1,7 @@
 abstract class Alg {
   Board board;
   int x, y, endX, endY, steps = 0, visited = 1, iterator = 1, time = millis();
-  boolean run = false, pause = false, travel = false;
+  boolean run = false, pause = false, travel = false, pathExists;
 
   void play() {
     if (!pause) init();
@@ -38,6 +38,7 @@ abstract class Alg {
     y = board.start.yi;
     endX = board.end.xi;
     endY = board.end.yi;
+    pathExists = false;
   }
 
   abstract void go();
