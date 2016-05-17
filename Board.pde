@@ -118,7 +118,7 @@ class Board {
     for (int i = tempX-1; i <= tempX+1; i++) {
       for (int j = tempY-1; j <= tempY+1; j++) {
         if (j>=0 && j<y && i>=0 && i<x) {
-          if ((j != tempY || i != tempX) && grab(i, j).open && !grab(i, j).wall) {
+          if ((j != tempY || i != tempX) && grab(i, j).open && !grab(i, j).wall && grab(i, j).open) {
             neighbors.add(grab(i, j).id);
           }
         }
