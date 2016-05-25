@@ -4,14 +4,16 @@ class Menu {
   int bh; //height of all buttons
   Board board;
   Alg alg;
+  MazeGen maze;
 
-  Menu(Board board, Alg algorithm, float posX, float posY, int sizeX, int sizeY, int buttonHeight) {
+  Menu(Board board, Alg algorithm, MazeGen m, float posX, float posY, int sizeX, int sizeY, int buttonHeight) {
     x = posX;
     y = posY;
     this.sizeX = sizeX;
     this.sizeY = sizeY;
     this.board = board;
     alg = algorithm;
+    maze = m;
     bh = buttonHeight;
     time = millis();
   }
@@ -29,6 +31,7 @@ class Menu {
     drawB5(false);
     drawB6(false);
     drawB7(false);
+    drawB8(false);
     drawAlgStatus();
   }
 
@@ -95,6 +98,14 @@ class Menu {
     rect(x + sizeX / 2, y + bh*3 + padding * 4, sizeX / 2 - padding, bh);
     fill(255);
     text("Pause", x + innerPadding + sizeX / 2, y + (bh + padding) * 4 - innerPadding);
+  }
+  
+  void drawB8(boolean hover) {
+    if (hover) fill(0, 240, 240);
+    else fill(0, 255, 255);
+    rect(x + padding, y + bh * 5 + padding * 6, sizeX - padding*2, bh);
+    fill(0);
+    text("Random Maze!", x + padding + innerPadding, y + (bh + padding) * 6 - innerPadding*1.5);
   }
 
   void listen() {  //Checks for click
@@ -165,5 +176,13 @@ class Menu {
         alg.pause();
       }
     } else drawB7(false);
+    
+    if (mouseX > x + padding && mouseX < x + sizeX && mouseY > y + bh*5 + padding*6 && mouseY < y + (bh + padding) * 6) { //Eight Button
+      drawB8(true);
+      if (mousePressed && millis() > time + 500) {
+        time = millis();
+        maze.makeBacktrack();
+      }
+    } else drawB8(false);
   }
 }

@@ -87,6 +87,7 @@ class Board {
           grid[i][x].open = true;
           grid[i][x].on = false;
           grid[i][x].parent = -1;
+          grid[i][x].sealed = false;
         }
       }
     }
@@ -101,6 +102,7 @@ class Board {
         grid[i][x].visited = false;
         grid[i][x].on = false;
         grid[i][x].parent = -1;
+        grid[i][x].sealed = false;
       }
     }
     display();
@@ -158,7 +160,7 @@ class Cell {
   float x, y;
   int xi, yi, size, id, parent;  //xi and yi are board indices
   double f;
-  boolean visited = false, wall = false, start = false, end = false, on = false, open = true;
+  boolean visited = false, wall = false, start = false, end = false, on = false, open = true, sealed = false;
 
   Cell(float x, float y, int px, int xi, int yi, int i) {
     this.x = x;
@@ -181,10 +183,11 @@ class Cell {
 
   void display() {
     stroke(0);
-    if (on) fill(255, 204, 0);
+    if (end) fill(0, 255, 0);
+    else if (on) fill(255, 204, 0);
     else if (wall) fill(0);
-    else if (end) fill(0, 255, 0);
     else if (start) fill(0, 0, 255);
+    else if (sealed) fill(50, 160, 50);
     else if (visited) fill(255, 255, 0);
     else fill(255);
     rect(x, y, size, size);
@@ -230,5 +233,38 @@ class Cell {
       display();
     }
     return newStatus;
+  }
+  
+  void touch(int draw) {
+    if (draw == 0) {
+        wall = true;
+        start = false;
+        end = false;
+        open = false;
+        visited = false;
+      } else if (draw == 1) {
+        wall = false;
+        start = false;
+        end = false;
+        open = true;
+        visited = false;
+      } else if (draw == 2) {
+        wall = false;
+        end = false;
+        start = true;
+        open = true;
+        visited = false;
+      } else if (draw == 3) {
+        wall = false;
+        start = false;
+        end = true;
+        open = true;
+        visited = false;
+      }
+      display();
+  }
+  
+  public String toString() {
+    return "" + id;
   }
 }

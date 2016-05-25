@@ -26,7 +26,7 @@ class AStarAlg extends Alg {
       if (!travel) {
         calc();
       }
-      if(pathExists) travel(closed);
+      if(pathExists) travel(path);
     }
   }
 
@@ -71,6 +71,13 @@ class AStarAlg extends Alg {
       board.grab(pathF.get(iterator)).display();
 
       steps++;  //Iterates
+      iterator++;
+    }
+    if(iterator == pathF.size() && millis() > time + 20) {
+      for(int i = 0; i < iterator; i++) {
+        board.grab(pathF.get(i)).sealed = true;
+        board.grab(pathF.get(i)).display();
+      }
       iterator++;
     }
   }
@@ -144,7 +151,7 @@ class BinaryHeap {
     return new ArrayList<Integer>(heap.subList(1, heap.size()));
   }
 
-  String toString() {
+  public String toString() {
     return getHeap().toString();
   }
 }
