@@ -11,13 +11,13 @@ class AStarAlg extends Alg {
 
   void init() {
     super.init();
-    open = new BinaryHeap(board);
     for (int node : closed) {
       board.grab(node).open = true;
     }
     closed.clear();
     path.clear();
     open = new BinaryHeap(board);
+    open.end = board.end.id;
     travel = false;
   }
 
@@ -26,7 +26,9 @@ class AStarAlg extends Alg {
       if (!travel) {
         calc();
       }
-      if(pathExists) travel(path);
+      if (pathExists) {
+        travel(path);
+      }
     }
   }
 
@@ -53,34 +55,6 @@ class AStarAlg extends Alg {
 
     travel = true;
   }
-
-  void travel(ArrayList<Integer> pathF) {
-    if (iterator < pathF.size() && millis() > time + 20) {  //makes sure iterator doesn't go out of bounds and that x ms has passed
-      time = millis();
-      x = board.grab(pathF.get(iterator)).xi;  //Updates coordinate values
-      y = board.grab(pathF.get(iterator)).yi;
-
-      board.grab(pathF.get(iterator-1)).on = false;  //Handles previous node
-      board.grab(pathF.get(iterator-1)).visited = true;
-      board.grab(pathF.get(iterator-1)).display();
-
-      if (!board.grab(pathF.get(iterator)).visited) visited++;  //So as to not overcount visited
-
-      board.grab(pathF.get(iterator)).visited = true;  //Handles current node
-      board.grab(pathF.get(iterator)).on = true;
-      board.grab(pathF.get(iterator)).display();
-
-      steps++;  //Iterates
-      iterator++;
-    }
-    if(iterator == pathF.size() && millis() > time + 20) {
-      for(int i = 0; i < iterator; i++) {
-        board.grab(pathF.get(i)).sealed = true;
-        board.grab(pathF.get(i)).display();
-      }
-      iterator++;
-    }
-  }
 }
 
 import java.util.Collections;
@@ -92,7 +66,6 @@ class BinaryHeap {
 
   BinaryHeap(Board board) {
     heap.add(-1);
-    end = board.end.id;
     this.board = board;
   }
 
@@ -153,5 +126,68 @@ class BinaryHeap {
 
   public String toString() {
     return getHeap().toString();
+  }
+}
+
+class SimpleAStar {
+  BinaryHeap open;
+  Board board;
+  ArrayList<Integer> closed = new ArrayList<Integer>();
+  ArrayList<Integer> path = new ArrayList<Integer>();
+
+  SimpleAStar(Board board) {
+    this.board = board;
+  }
+
+  ArrayList<Integer> calc(Cell start, Cell end) {
+    open = new BinaryHeap(board);
+    open.end = end.id;
+    for (int node : closed) {
+      board.grab(node).open = true;
+    }
+    closed.clear();
+    path.clear();
+
+    int bNode = start.id;
+    open.add(bNode, bNode);
+    for (int z = 0; z < board.x*board.y; z++) {
+      bNode = open.getMQ();
+      if (bNode == -1) break;
+      board.grab(bNode).open = false;
+      closed.add(bNode);
+      if (bNode == end.id) break;
+      open.add(board.openNeighbors(bNode), bNode);
+    }
+
+    int curNode = end.id;
+    if (end.parent != -1) {
+      while (curNode != start.id) {
+        path.add(0, curNode);
+        curNode = board.grab(curNode).parent;
+      }
+    }
+
+    return path;
+  }
+}
+
+class testAlg extends Alg {
+  SimpleAStar aStar;
+  ArrayList<Integer> path = new ArrayList<Integer>();
+
+  testAlg(Board board) {
+    this.board = board;
+  }
+
+  void go() {
+    if (run) {
+      if (!travel) {
+        aStar = new SimpleAStar(board);
+        path = aStar.calc(board.start, board.end);
+        travel = true;
+      } else {
+        if (path.size() > 0) travel(path);
+      }
+    }
   }
 }

@@ -4,48 +4,48 @@ class KeyboardAlg extends Alg {
     this.board = board;
   }
 
-  void go() {  //really listen() for manual keyboard controls
-    if (run && (x != endX || y != endY)) {
+  void go() {  //reallx listen() for manual keyboard controls
+    if (run && (y != endX || x != endY)) {
       if (key==CODED) {
-        if (keyCode == UP && y != 0 && !board.grab(x, y-1).wall) {
-          board.grab(x, y).on = false;
-          board.grab(x, y).visited = true;
-          board.grab(x, y).display();
-          y--;
-          if (!board.grab(x, y).visited) visited++;
-          board.grab(x, y).visited = true;
-          board.grab(x, y).on = true;
-          board.grab(x, y).display();
-          steps++;
-        } else if (keyCode == DOWN && y != board.y-1 && !board.grab(x, y+1).wall) {
-          board.grab(x, y).on = false;
-          board.grab(x, y).visited = true;
-          board.grab(x, y).display();
-          y++;
-          if (!board.grab(x, y).visited) visited++;
-          board.grab(x, y).visited = true;
-          board.grab(x, y).on = true;
-          board.grab(x, y).display();
-          steps++;
-        } else if (keyCode == LEFT && x != 0 && !board.grab(x-1, y).wall) {
-          board.grab(x, y).on = false;
-          board.grab(x, y).visited = true;
-          board.grab(x, y).display();
+        if (keyCode == LEFT && x != 0 && !board.grab(y, x-1).wall) {
+          board.grab(y, x).on = false;
+          board.grab(y, x).visited = true;
+          board.grab(y, x).display();
           x--;
-          if (!board.grab(x, y).visited) visited++;
-          board.grab(x, y).visited = true;
-          board.grab(x, y).on = true;
-          board.grab(x, y).display();
+          if (!board.grab(y, x).visited) visited++;
+          board.grab(y, x).visited = true;
+          board.grab(y, x).on = true;
+          board.grab(y, x).display();
           steps++;
-        } else if (keyCode == RIGHT && x != board.x-1 && !board.grab(x+1, y).wall) {
-          board.grab(x, y).on = false;
-          board.grab(x, y).visited = true;
-          board.grab(x, y).display();
+        } else if (keyCode == RIGHT && x != board.x-1 && !board.grab(y, x+1).wall) {
+          board.grab(y, x).on = false;
+          board.grab(y, x).visited = true;
+          board.grab(y, x).display();
           x++;
-          if (!board.grab(x, y).visited) visited++;
-          board.grab(x, y).visited = true;
-          board.grab(x, y).on = true;
-          board.grab(x, y).display();
+          if (!board.grab(y, x).visited) visited++;
+          board.grab(y, x).visited = true;
+          board.grab(y, x).on = true;
+          board.grab(y, x).display();
+          steps++;
+        } else if (keyCode == UP && y != 0 && !board.grab(y-1, x).wall) {
+          board.grab(y, x).on = false;
+          board.grab(y, x).visited = true;
+          board.grab(y, x).display();
+          y--;
+          if (!board.grab(y, x).visited) visited++;
+          board.grab(y, x).visited = true;
+          board.grab(y, x).on = true;
+          board.grab(y, x).display();
+          steps++;
+        } else if (keyCode == DOWN && y != board.y-1 && !board.grab(y+1, x).wall) {
+          board.grab(y, x).on = false;
+          board.grab(y, x).visited = true;
+          board.grab(y, x).display();
+          y++;
+          if (!board.grab(y, x).visited) visited++;
+          board.grab(y, x).visited = true;
+          board.grab(y, x).on = true;
+          board.grab(y, x).display();
           steps++;
         }
       }

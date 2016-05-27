@@ -1,5 +1,6 @@
 class MazeGen {
   Board board;
+  boolean skew = false, diPath = false;
   Space[][] subMap;
 
   MazeGen(Board b) {
@@ -35,9 +36,9 @@ class MazeGen {
     ArrayList<Space> seq = new ArrayList<Space>();
     seq.add(start);
     carve(seq);
-    
+
     Space end = subMap[(int)(Math.random()*board.y/2)][(int)(Math.random()*board.x/2)];
-    while(Math.sqrt((start.x-end.x)*(start.x-end.x) + (start.y-end.y)*(start.y-end.y)) < subMap.length/2) {
+    while (Math.sqrt((start.x-end.x)*(start.x-end.x) + (start.y-end.y)*(start.y-end.y)) < subMap.length/2) {
       end = subMap[(int)(Math.random()*board.y/2)][(int)(Math.random()*board.x/2)];
     }
     end.cell.touch(3);
@@ -51,7 +52,14 @@ class MazeGen {
     Space current = sequence.get(sequence.size()-1);
     ArrayList<Space> ns = neighbors(current.x, current.y);
     if (ns.size() > 0) {
+      if (skew) ns.add(ns.get(0));
       Space next = ns.get((int)(Math.random() * ns.size()));
+      Space next2 = ns.get((int)(Math.random() * ns.size()));
+      if (next2 != next && diPath) {
+        sequence.add(next2);
+        next2.visited = true;
+        board.grab(current.x+next2.x, current.y+next2.y).touch(1);
+      }
       sequence.add(next);
       next.visited = true;
       board.grab(current.x+next.x, current.y+next.y).touch(1);

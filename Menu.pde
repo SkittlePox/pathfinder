@@ -105,7 +105,7 @@ class Menu {
     else fill(0, 255, 255);
     rect(x + padding, y + bh * 5 + padding * 6, sizeX - padding*2, bh);
     fill(0);
-    text("Random Maze!", x + padding + innerPadding, y + (bh + padding) * 6 - innerPadding*1.5);
+    text("RCB Maze!", x + padding + innerPadding, y + (bh + padding) * 6 - innerPadding*1.5);
   }
 
   void listen() {  //Checks for click
@@ -181,6 +181,10 @@ class Menu {
       drawB8(true);
       if (mousePressed && millis() > time + 500) {
         time = millis();
+        if (alg.isRunning()) {
+          board.clearAllExceptWalls();
+          alg.kill();
+        }
         maze.makeBacktrack();
       }
     } else drawB8(false);
