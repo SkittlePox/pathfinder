@@ -103,6 +103,7 @@ class Board {
         grid[i][x].on = false;
         grid[i][x].parent = -1;
         grid[i][x].sealed = false;
+        grid[i][x].marked = false;
       }
     }
     display();
@@ -117,7 +118,6 @@ class Board {
   }
 
   ArrayList<Integer> openNeighbors(int id) {
-
     ArrayList<Integer> neighbors = new ArrayList<Integer>();
     int tempX = grab(id).yi, tempY = grab(id).xi;
     boolean n = false, e = false, s = false, w = false;
@@ -151,7 +151,32 @@ class Board {
         neighbors.add(grab(tempX+1, tempY+1).id);
       }
     }
-    
+
+    return neighbors;
+  }
+  
+  ArrayList<Integer> visibleOpenNeighbors(int id, int r) {  //Plus formation only!!!
+    ArrayList<Integer> neighbors = new ArrayList<Integer>();
+    int tempX = grab(id).yi, tempY = grab(id).xi;
+    int count = 1;
+
+    for (int i = -1; i < 2; i+=2) {
+      while (tempY-(i* count) >= 0 && tempY-(i* count) < board.y && count <= r) {
+        if (!grab(tempX, tempY-(i*count)).wall && grab(tempX, tempY-(i*count)).open) {
+          neighbors.add(grab(tempX, tempY-(i*count)).id);
+        } else break;
+        count++;
+      }
+      count = 1;
+      while (tempX-(i*count) >= 0 && tempX-(i*count) < board.x && count <= r) {
+        if (!grab(tempX-(i*count), tempY).wall && grab(tempX-(i*count), tempY).open) {
+          neighbors.add(grab(tempX-(i*count), tempY).id);
+        } else break;
+        count++;
+      }
+      count = 1;
+    }
+
     return neighbors;
   }
 }
@@ -160,7 +185,7 @@ class Cell {
   float x, y;
   int xi, yi, size, id, parent;  //xi and yi are board indices
   double f;
-  boolean visited = false, wall = false, start = false, end = false, on = false, open = true, sealed = false;
+  boolean visited = false, wall = false, start = false, end = false, on = false, open = true, sealed = false, marked = false;
 
   Cell(float x, float y, int px, int xi, int yi, int i) {
     this.x = x;
@@ -187,6 +212,7 @@ class Cell {
     else if (on) fill(255, 204, 0);
     else if (wall) fill(0);
     else if (start) fill(0, 0, 255);
+    else if (marked) fill(208, 80, 208);
     else if (sealed) fill(50, 160, 50);
     else if (visited) fill(255, 255, 0);
     else fill(255);
@@ -209,18 +235,21 @@ class Cell {
         end = false;
         open = false;
         visited = false;
+        marked = false;
       } else if (draw == 1) {
         wall = false;
         start = false;
         end = false;
         open = true;
         visited = false;
+        marked = false;
       } else if (draw == 2) {
         wall = false;
         end = false;
         start = true;
         open = true;
         visited = false;
+        marked = false;
         newStatus = 1;
       } else if (draw == 3) {
         wall = false;
@@ -228,42 +257,57 @@ class Cell {
         end = true;
         open = true;
         visited = false;
+        marked = false;
         newStatus = 2;
+      } else if (draw == 4) {
+        wall = false;
+        open = true;
+        visited = false;
+        marked = true;
       }
       display();
     }
     return newStatus;
   }
-  
+
   void touch(int draw) {
     if (draw == 0) {
-        wall = true;
-        start = false;
-        end = false;
-        open = false;
-        visited = false;
-      } else if (draw == 1) {
-        wall = false;
-        start = false;
-        end = false;
-        open = true;
-        visited = false;
-      } else if (draw == 2) {
-        wall = false;
-        end = false;
-        start = true;
-        open = true;
-        visited = false;
-      } else if (draw == 3) {
-        wall = false;
-        start = false;
-        end = true;
-        open = true;
-        visited = false;
-      }
-      display();
+      wall = true;
+      start = false;
+      end = false;
+      open = false;
+      visited = false;
+      marked = false;
+    } else if (draw == 1) {
+      wall = false;
+      start = false;
+      end = false;
+      open = true;
+      marked = false;
+      visited = false;
+    } else if (draw == 2) {
+      wall = false;
+      end = false;
+      start = true;
+      open = true;
+      visited = false;
+      marked = false;
+    } else if (draw == 3) {
+      wall = false;
+      start = false;
+      end = true;
+      open = true;
+      visited = false;
+      marked = false;
+    } else if (draw == 4) {
+      wall = false;
+      open = true;
+      visited = false;
+      marked = true;
+    }
+    display();
   }
-  
+
   public String toString() {
     return "" + id;
   }

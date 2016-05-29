@@ -41,7 +41,7 @@ class AStarAlg extends Alg {
       board.grab(bNode).open = false;
       closed.add(bNode);
       if (bNode == board.end.id) break;
-      open.add(board.openNeighbors(bNode), bNode);
+      open.add(board.openNeighbors(bNode), bNode);  //Hardcoded radius of one for vanilla A*
     }
 
     int curNode = board.end.id;
@@ -134,7 +134,7 @@ class SimpleAStar {
   Board board;
   ArrayList<Integer> closed = new ArrayList<Integer>();
   ArrayList<Integer> path = new ArrayList<Integer>();
-
+  
   SimpleAStar(Board board) {
     this.board = board;
   }
@@ -168,26 +168,5 @@ class SimpleAStar {
     }
 
     return path;
-  }
-}
-
-class testAlg extends Alg {
-  SimpleAStar aStar;
-  ArrayList<Integer> path = new ArrayList<Integer>();
-
-  testAlg(Board board) {
-    this.board = board;
-  }
-
-  void go() {
-    if (run) {
-      if (!travel) {
-        aStar = new SimpleAStar(board);
-        path = aStar.calc(board.start, board.end);
-        travel = true;
-      } else {
-        if (path.size() > 0) travel(path);
-      }
-    }
   }
 }

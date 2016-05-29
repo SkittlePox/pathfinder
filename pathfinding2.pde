@@ -1,6 +1,6 @@
 Board board;
 Menu menu;
-Alg manual, astar, astartest;
+Alg manual, astar, s1;
 AlgHandler handler;
 MazeGen maze;
 int gridX = 50, gridY = 50, px = 14, offset = 40;  //px is side of each cell, offset is space to the left of board
@@ -13,11 +13,11 @@ void setup() {
   board = new Board(gridX, gridY, px, offset);
   maze = new MazeGen(board);
   manual = new KeyboardAlg(board);
-  astartest = new testAlg(board);
   astar = new AStarAlg(board);
+  s1 = new Species(board, 20, 20, 20);
   handler = new AlgHandler();
-  handler.algs.add(astar);
-  menu = new Menu(board, astar, maze, gridY * px + 800 - gridY * px, (800 - gridY * px) / 2, 300, 600, 50);
+  handler.algs.add(s1);
+  menu = new Menu(board, s1, maze, gridY * px + 800 - gridY * px, (800 - gridY * px) / 2, 300, 600, 50);
   menu.display();
   board.display();
 }
