@@ -1,8 +1,9 @@
 class Species extends Alg {
   SimpleAStar astar;
+  RouteList routes;
   ArrayList<Integer> path, possibles;
   int vision, speed, cognition, id = -1, count = 1, mIndex = 1;
-  double units = 0, propConstant = 0.5;
+  double units = 0, propConstant = 0.7;
 
   Species(Board board, int v, int s, int c) {
     this.board = board;
@@ -17,6 +18,7 @@ class Species extends Alg {
     astar = new SimpleAStar(board);
     path = new ArrayList<Integer>();
     possibles = new ArrayList<Integer>();
+    routes = new RouteList(vision, astar, board);
   }
 
   void go() {
@@ -45,12 +47,12 @@ class Species extends Alg {
       if (possibles.size() > 0) {
         int nextnode = possibles.get(0);
         for (Integer pos : possibles) {
-          if (board.nodeDist(pos, board.end.id)*propConstant + board.nodeDist(curnode, pos) <
-          board.nodeDist(nextnode, board.end.id)* propConstant + board.nodeDist(curnode, nextnode)) {  //Edit this conditional - account for memory of previous routes
+          if (board.nodeDist(pos, board.end.id)*propConstant + routes.nodeDist(curnode, pos) <
+          board.nodeDist(nextnode, board.end.id)*propConstant + routes.nodeDist(curnode, nextnode)) {  //Edit this conditional - account for memory of previous routes
             nextnode = pos;
           }
         }
-        ArrayList<Integer> newPath = astar.calc(board.grab(curnode), board.grab(nextnode));
+        ArrayList<Integer> newPath = routes.findRoute(curnode, nextnode);
         path.addAll(newPath);
         curnode = nextnode;
         if (curnode == board.end.id) break;
@@ -63,7 +65,6 @@ class Species extends Alg {
   void travel(ArrayList<Integer> pathF) {
     if (iterator < pathF.size() && millis() > time + 20) {  //makes sure iterator doesn't go out of bounds and that x ms has passed
       time = millis();
-      System.out.println(pathF.get(iterator));
       x = board.grab(pathF.get(iterator)).xi;  //Updates coordinate values
       y = board.grab(pathF.get(iterator)).yi;
 
@@ -132,14 +133,26 @@ class RouteList {
         ArrayList<Integer> bridgeB = new ArrayList<Integer>();
         if(possible.get(aPos) != a) {
           bridgeA = astar.calc(board.grab(a), board.grab(possible.get(aPos)));
-          bridgeA.remove(bridgeA.size()-1);
         }
         if(possible.get(bPos) != b) {
           bridgeB = astar.calc(board.grab(b), board.grab(possible.get(bPos)));
-          bridgeB.remove(bridgeB.size()-1);
         }
         
         //Make route, then append bridges
+        if(aPos < bPos) {
+          bridgeA.remove(bridgeA.size()-1);
+          bridgeB.remove(0);
+          path.addAll(bridgeA);
+          path.addAll(new ArrayList<Integer>(possible.subList(aPos, bPos+1)));
+          path.addAll(bridgeB);
+        }
+        else {
+          bridgeA.remove(bridgeB.size()-1);
+          bridgeB.remove(0);
+          path.addAll(bridgeA);
+          path.addAll(reverse(new ArrayList<Integer>(possible.subList(aPos, bPos+1))));
+          path.addAll(bridgeB);
+        }
         
         if(aPos == 0 && bridgeA.size() > 0) {
           possible.addAll(0, bridgeA);
@@ -152,17 +165,28 @@ class RouteList {
           possible.addAll(reverse(bridgeB));
         }
         
+        return path;
       }
       else {
         aPos = -1;
         bPos = -1;
       }
     }
+    
+    routes.add(astar.calc(board.grab(a), board.grab(b)));
+    return routes.get(routes.size()-1);
+  }
+  
+  double nodeDist(int a, int b) {
+    for(ArrayList<Integer> p : routes) {
+      if(p.contains(a) && p.contains(b)) return Math.abs(p.indexOf(a) - p.indexOf(b));
+    }
+    return board.nodeDist(a, b);
   }
   
   ArrayList<Integer> reverse(ArrayList<Integer> list) {
     ArrayList<Integer> rev = new ArrayList<Integer>();
     for(Integer i : list) rev.add(0, i);
-    return list;
+    return rev;
   }
 }
