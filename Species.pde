@@ -93,6 +93,76 @@ class Species extends Alg {
   }
 }
 
-//class RouteList {
-//  ArrayList<Integer>
-//}
+class RouteList {
+  SimpleAStar astar;
+  Board board;
+  ArrayList<ArrayList<Integer>> routes = new ArrayList<ArrayList<Integer>>();
+  int sight;
+  
+  RouteList(int s, SimpleAStar a, Board board) {
+    sight = s;
+    astar = a;
+    this.board = board;
+  }
+  
+  ArrayList<Integer> findRoute(int a, int b) {
+    ArrayList<Integer> path = new ArrayList<Integer>();
+    int aPos = -1, bPos = -1;
+    ArrayList<Integer> aSights = board.visibleOpenNeighbors(a, sight);
+    ArrayList<Integer> bSights = board.visibleOpenNeighbors(b, sight);
+    aSights.add(0, a);
+    bSights.add(0, b);
+    
+    for(ArrayList<Integer> possible : routes) {  //Check each stored route
+      for(Integer aTest : aSights) {
+        if(possible.contains(aTest)) {
+          aPos = possible.indexOf(aTest);
+          break;
+        }
+      }
+      for(Integer bTest : bSights) {
+        if(possible.contains(bTest)) {
+          bPos = possible.indexOf(bTest);
+          break;
+        }
+      }
+      
+      if(aPos!= -1 && bPos != -1) {
+        ArrayList<Integer> bridgeA = new ArrayList<Integer>();
+        ArrayList<Integer> bridgeB = new ArrayList<Integer>();
+        if(possible.get(aPos) != a) {
+          bridgeA = astar.calc(board.grab(a), board.grab(possible.get(aPos)));
+          bridgeA.remove(bridgeA.size()-1);
+        }
+        if(possible.get(bPos) != b) {
+          bridgeB = astar.calc(board.grab(b), board.grab(possible.get(bPos)));
+          bridgeB.remove(bridgeB.size()-1);
+        }
+        
+        //Make route, then append bridges
+        
+        if(aPos == 0 && bridgeA.size() > 0) {
+          possible.addAll(0, bridgeA);
+        } else if(aPos == possible.size()-1 && bridgeA.size() > 0) {
+          possible.addAll(reverse(bridgeA));
+        }
+        if(bPos == 0 && bridgeB.size() > 0) {
+          possible.addAll(0, bridgeB);
+        } else if(bPos == possible.size()-1 && bridgeB.size() > 0) {
+          possible.addAll(reverse(bridgeB));
+        }
+        
+      }
+      else {
+        aPos = -1;
+        bPos = -1;
+      }
+    }
+  }
+  
+  ArrayList<Integer> reverse(ArrayList<Integer> list) {
+    ArrayList<Integer> rev = new ArrayList<Integer>();
+    for(Integer i : list) rev.add(0, i);
+    return list;
+  }
+}
