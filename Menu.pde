@@ -3,17 +3,19 @@ class Menu {
   int sizeX, sizeY, time;
   int bh; //height of all buttons
   Board board;
-  Alg alg;
+  AlgHandler handler;
   MazeGen maze;
+  MazeHandler mazeStorage;
 
-  Menu(Board board, Alg algorithm, MazeGen m, float posX, float posY, int sizeX, int sizeY, int buttonHeight) {
+  Menu(Board board, AlgHandler handler, MazeGen m, float posX, float posY, int sizeX, int sizeY, int buttonHeight) {
     x = posX;
     y = posY;
     this.sizeX = sizeX;
     this.sizeY = sizeY;
     this.board = board;
-    alg = algorithm;
+    this.handler = handler;
     maze = m;
+    mazeStorage = new MazeHandler();
     bh = buttonHeight;
     time = millis();
   }
@@ -32,6 +34,9 @@ class Menu {
     drawB6(false);
     drawB7(false);
     drawB8(false);
+    drawB9(false);
+    drawB10(false);
+    drawB11(false);
     drawAlgStatus();
   }
 
@@ -40,7 +45,7 @@ class Menu {
     rect(x + padding, y + bh * 4 + padding * 5, sizeX - padding*2, bh);
     fill(0);
     //textSize(24);
-    text("Steps: " + alg.steps(), x + padding + innerPadding, y + (bh + padding) * 5 - innerPadding*1.5);
+    text("Steps: " + handler.main.steps(), x + padding + innerPadding, y + (bh + padding) * 5 - innerPadding*1.5);
     textSize(32);
   }
 
@@ -107,6 +112,30 @@ class Menu {
     fill(0);
     text("RCB Maze!", x + padding + innerPadding, y + (bh + padding) * 6 - innerPadding*1.5);
   }
+  
+  void drawB9(boolean hover) {
+    if (hover) fill(0, 120, 120);
+    else fill(0, 200, 200);
+    rect(x + padding, y + bh * 6 + padding * 7, sizeX/2 - padding, bh);
+    fill(0);
+    text("Save", x + padding + innerPadding, y + (bh + padding) * 7 - innerPadding*1.5);
+  }
+  
+  void drawB10(boolean hover) {
+    if (hover) fill(0, 120, 120);
+    else fill(0, 200, 200);
+    rect(x + sizeX/2, y + bh * 6 + padding * 7, sizeX/2 - padding, bh);
+    fill(0);
+    text("Load", x + innerPadding + sizeX/2, y + (bh + padding) * 7 - innerPadding*1.5);
+  }
+  
+  void drawB11(boolean hover) {
+    if (hover) fill(0, 240, 240);
+    else fill(0, 255, 255);
+    rect(x + padding, y + bh * 7 + padding * 8, sizeX - padding*2, bh);
+    fill(0);
+    text("Cycle Algs", x + padding + innerPadding, y + (bh + padding) * 8 - innerPadding*1.5);
+  }
 
   void listen() {  //Checks for click
     if (mouseX > x + padding && mouseX < x + sizeX - padding && mouseY > y + padding && mouseY < y + padding + bh) { //First Button
@@ -114,16 +143,16 @@ class Menu {
       if (mousePressed) {
         board.clearAll();
         board.drawWall();
-        alg.kill();
+        handler.main.kill();
       }
     } else drawB1(false);
 
     if (mouseX > x + padding && mouseX < x + sizeX/2 && mouseY > y + bh + padding*2 && mouseY < y + (bh + padding) * 2) { //Second Button
       drawB2(true);
       if (mousePressed) {
-        if (alg.isRunning()) {
+        if (handler.main.isRunning()) {
           board.clearAllExceptWalls();
-          alg.kill();
+          handler.main.kill();
         }
         board.drawWall();
       }
@@ -132,9 +161,9 @@ class Menu {
     if (mouseX > x + sizeX/2 && mouseX < x + sizeX-padding && mouseY > y + bh + padding*2 && mouseY < y + (bh + padding) * 2) { //Third Button
       drawB3(true);
       if (mousePressed) {
-        if (alg.isRunning()) {
+        if (handler.main.isRunning()) {
           board.clearAllExceptWalls();
-          alg.kill();
+          handler.main.kill();
         }
         board.drawFree();
       }
@@ -143,9 +172,9 @@ class Menu {
     if (mouseX > x + padding && mouseX < x + sizeX/2 && mouseY > y + bh*2 + padding*3 && mouseY < y + (bh + padding) * 3) { //Fourth Button
       drawB4(true);
       if (mousePressed) {
-        if (alg.isRunning()) {
+        if (handler.main.isRunning()) {
           board.clearAllExceptWalls();
-          alg.kill();
+          handler.main.kill();
         }
         board.selectStart();
       }
@@ -154,9 +183,9 @@ class Menu {
     if (mouseX > x + sizeX/2 && mouseX < x + sizeX-padding && mouseY > y + bh*2 + padding*3 && mouseY < y + (bh + padding) * 3) { //Fifth Button
       drawB5(true);
       if (mousePressed) {
-        if (alg.isRunning()) {
+        if (handler.main.isRunning()) {
           board.clearAllExceptWalls();
-          alg.kill();
+          handler.main.kill();
         }
         board.selectEnd();
       }
@@ -166,14 +195,14 @@ class Menu {
       drawB6(true);
       if (mousePressed && millis() > time + 500) {
         time = millis();
-        if (board.start != null && board.end != null) alg.play();
+        if (board.start != null && board.end != null) handler.main.play();
       }
     } else drawB6(false);
 
     if (mouseX > x + sizeX/2 && mouseX < x + sizeX-padding && mouseY > y + bh*3 + padding*4 && mouseY < y + (bh + padding) * 4) { //Seventh Button
       drawB7(true);
       if (mousePressed) {
-        alg.pause();
+        handler.main.pause();
       }
     } else drawB7(false);
     
@@ -181,12 +210,46 @@ class Menu {
       drawB8(true);
       if (mousePressed && millis() > time + 500) {
         time = millis();
-        if (alg.isRunning()) {
+        if (handler.main.isRunning()) {
           board.clearAllExceptWalls();
-          alg.kill();
+          handler.main.kill();
         }
         maze.makeBacktrack();
       }
     } else drawB8(false);
+    
+    if (mouseX > x + padding && mouseX < x + sizeX/2 && mouseY > y + bh*6 + padding*7 && mouseY < y + (bh + padding) * 7) { //Ninth Button
+      drawB9(true);
+      if (mousePressed && millis() > time + 500) {
+        time = millis();
+        maze.saveMaze("testStorage.txt");
+        mazeStorage.add("testStorage.txt");
+      }
+    } else drawB9(false);
+    
+    if (mouseX > x + sizeX/2 && mouseX < x + sizeX-padding && mouseY > y + bh*6 + padding*7 && mouseY < y + (bh + padding) * 7) { //Tenth Button
+      drawB10(true);
+      if (mousePressed && millis() > time + 500) {
+        time = millis();
+        if (handler.main.isRunning()) {
+          board.clearAllExceptWalls();
+          handler.main.kill();
+        }
+        board.readMaze("testStorage.txt");
+      }
+    } else drawB10(false);
+    
+    if (mouseX > x + padding && mouseX < x + sizeX && mouseY > y + bh*7 + padding*8 && mouseY < y + (bh + padding) * 8) { //Eleventh Button
+      drawB11(true);
+      if (mousePressed && millis() > time + 500) {
+        time = millis();
+        if (handler.main.isRunning()) {
+          board.clearAllExceptWalls();
+          handler.main.kill();
+        }
+        handler.algs.add(0, handler.algs.remove(handler.algs.size()-1));
+        handler.main = handler.algs.get(0);
+      }
+    } else drawB11(false);
   }
 }

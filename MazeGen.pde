@@ -1,6 +1,9 @@
+import java.io.File.*;
+
 class MazeGen {
   Board board;
-  boolean skew = false, diPath = false;
+  PrintWriter out;
+  boolean skew = false, diPath = false, write = false;
   Space[][] subMap;
 
   MazeGen(Board b) {
@@ -16,6 +19,30 @@ class MazeGen {
         }
       }
     }
+  }
+
+  void saveMaze(String filename) {
+    try {
+      File f = new File(filename);
+      f.delete();
+    } 
+    catch(Exception e) {
+      e.printStackTrace();
+    }
+    out = createWriter(filename);
+    for (int i = 0; i < board.x; i++) {
+      String row = "";
+      for (int j = 0; j < board.y; j++) {
+        Cell curcell = board.grab(i, j);
+        if (curcell.wall) row += "0";
+        else if (curcell.start) row += "2";
+        else if (curcell.end) row += "3";
+        else row += "1";
+      }
+      out.println(row);
+      out.flush();
+    }
+    out.close();
   }
 
   void makeBacktrack() {
@@ -92,5 +119,21 @@ class Space {
 
   public String toString() {
     return cell.toString();
+  }
+}
+
+class MazeHandler {
+  ArrayList<String> mazeFiles;
+
+  MazeHandler() {
+    mazeFiles = new ArrayList<String>();
+  }
+
+  void add(String filename) {
+    mazeFiles.add(filename);
+  }
+
+  void clear() {
+    mazeFiles.clear();
   }
 }

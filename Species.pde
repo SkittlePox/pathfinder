@@ -3,7 +3,7 @@ class Species extends Alg {
   RouteList routes;
   ArrayList<Integer> path, possibles;
   int vision, speed, cognition, id = -1, count = 1, mIndex = 1;
-  double units = 0, propConstant = 0.7;
+  double units = 0, propConstant = .7;
 
   Species(Board board, int v, int s, int c) {
     this.board = board;
@@ -59,37 +59,6 @@ class Species extends Alg {
         //board.grab(nextnode).touch(4);
       } else break;
       //units+= 1*some constant
-    }
-  }
-
-  void travel(ArrayList<Integer> pathF) {
-    if (iterator < pathF.size() && millis() > time + 20) {  //makes sure iterator doesn't go out of bounds and that x ms has passed
-      time = millis();
-      x = board.grab(pathF.get(iterator)).xi;  //Updates coordinate values
-      y = board.grab(pathF.get(iterator)).yi;
-
-      if (pathF.get(iterator-1) >= 0) {
-        board.grab(pathF.get(iterator-1)).on = false;  //Handles previous node
-        board.grab(pathF.get(iterator-1)).visited = true;
-        board.grab(pathF.get(iterator-1)).display();
-      }
-
-      if (!board.grab(pathF.get(iterator)).visited) visited++;  //So as to not overcount visited
-
-      board.grab(pathF.get(iterator)).visited = true;  //Handles current node
-      board.grab(pathF.get(iterator)).on = true;
-      board.grab(pathF.get(iterator)).display();
-
-      steps++;  //Iterates
-      iterator++;
-      count++;
-    }
-    if (iterator == pathF.size() && millis() > time + 20) {
-      for (int i = 0; i < iterator; i++) {
-        board.grab(pathF.get(i)).sealed = true;
-        board.grab(pathF.get(i)).display();
-      }
-      iterator++;
     }
   }
 }
@@ -181,7 +150,7 @@ class RouteList {
     for(ArrayList<Integer> p : routes) {
       if(p.contains(a) && p.contains(b)) return Math.abs(p.indexOf(a) - p.indexOf(b));
     }
-    return board.nodeDist(a, b);
+    return board.nodeDist(a, b)*30;
   }
   
   ArrayList<Integer> reverse(ArrayList<Integer> list) {

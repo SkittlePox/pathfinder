@@ -2,6 +2,7 @@ class Board {
   Cell[][] grid;
   ArrayList<Cell> cells;
   Cell start, end;
+  BufferedReader in;
   int pxsize, offset;
   int x, y;
   int draw = 0;
@@ -26,6 +27,24 @@ class Board {
 
   double nodeDist(int a, int b) {
     return Math.sqrt(Math.abs(grab(a).xi-grab(b).xi)*Math.abs(grab(a).xi-grab(b).xi) + Math.abs(grab(a).yi-grab(b).yi)*Math.abs(grab(a).yi-grab(b).yi));
+  }
+
+  void readMaze(String filename) {
+    try {
+      in = createReader(filename);
+      for (int i = 0; i < y; i++) {
+        String[] crudeInput = in.readLine().split("");
+        for (int j = 0; j < crudeInput.length; j++) {
+          grab(i, j).touch(Integer.parseInt(crudeInput[j]));
+          grab(i, j).display();
+          if(Integer.parseInt(crudeInput[j]) == 2) start = grab(i, j);
+          if(Integer.parseInt(crudeInput[j]) == 3) end = grab(i, j);
+        }
+      }
+    } 
+    catch(Exception e) {
+      e.printStackTrace();
+    }
   }
 
   void drawWall() {
@@ -154,7 +173,7 @@ class Board {
 
     return neighbors;
   }
-  
+
   ArrayList<Integer> visibleOpenNeighbors(int id, int r) {  //Plus formation only!!!
     ArrayList<Integer> neighbors = new ArrayList<Integer>();
     int tempX = grab(id).yi, tempY = grab(id).xi;

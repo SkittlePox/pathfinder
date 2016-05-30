@@ -27,7 +27,7 @@ class AStarAlg extends Alg {
         calc();
       }
       if (pathExists) {
-        travel(path);
+        travel(closed);
       }
     }
   }
