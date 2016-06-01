@@ -24,11 +24,14 @@ class Species extends Alg {
   void go() {
     if (run) {
       if (!travel) {
+        //int t = millis();
         calc();
+        //System.out.println("Species 1 " + (millis()-t));
         travel = true;
       }
       if (path.size() > 0) {
         travel(path);
+        eunits = steps;
       }
     }
   }

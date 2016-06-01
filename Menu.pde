@@ -44,8 +44,8 @@ class Menu {
     fill(255);
     rect(x + padding, y + bh * 4 + padding * 5, sizeX - padding*2, bh);
     fill(0);
-    //textSize(24);
-    text("Steps: " + handler.main.steps(), x + padding + innerPadding, y + (bh + padding) * 5 - innerPadding*1.5);
+    textSize(28);
+    text("E Units: " + handler.main.eunits, x + padding + innerPadding, y + (bh + padding) * 5 - innerPadding*1.5);
     textSize(32);
   }
 

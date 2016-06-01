@@ -1,6 +1,7 @@
 abstract class Alg {
   Board board;
   int x, y, endX, endY, steps = 0, visited = 1, iterator = 1, time = millis();
+  double eunits = 0;
   boolean run = false, pause = false, travel = false, pathExists;
 
   void play() {
@@ -10,6 +11,7 @@ abstract class Alg {
 
   void kill() {
     steps = 0;
+    eunits = 0;
     iterator = 1;
     run = false;
     travel = false;
@@ -22,16 +24,14 @@ abstract class Alg {
       pause = true;
     }
   }
-
-  int steps() {
-    return steps;
-  }
+  
   boolean isRunning() {
     return run;
   }
 
   void init() {
     steps = 0;
+    eunits = 0;
     iterator = 1;
     board.clearAllExceptWalls();
     x = board.start.xi;

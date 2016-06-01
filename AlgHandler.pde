@@ -7,9 +7,6 @@ class AlgHandler {
   }
   
   void go() {
-    //for(Alg a : algs) {
-    //  a.go();
-    //}
     if(main!= null) main.go();
   }
 }

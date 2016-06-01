@@ -24,7 +24,6 @@ void setup() {
   menu = new Menu(board, handler, maze, gridX * px + offset*2, offset, 250, gridY*px, 50);
   menu.display();
   board.display();
-  board.readMaze("maze.txt");
 }
 
 void draw() {

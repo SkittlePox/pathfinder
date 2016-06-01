@@ -24,7 +24,12 @@ class Board {
       }
     }
   }
-
+  
+  Board(Board b) {
+    this(b.x, b.y, b.pxsize, b.offset);
+    //impart(b);
+  }
+  
   double nodeDist(int a, int b) {
     return Math.sqrt(Math.abs(grab(a).xi-grab(b).xi)*Math.abs(grab(a).xi-grab(b).xi) + Math.abs(grab(a).yi-grab(b).yi)*Math.abs(grab(a).yi-grab(b).yi));
   }
@@ -236,7 +241,9 @@ class Cell {
     else if (visited) fill(255, 255, 0);
     else fill(255);
     rect(x, y, size, size);
-    //textSize(12);
+    
+    
+    //textSize(8);
     //fill(127);
     //text(id, x, y + size);
     //textSize(32);

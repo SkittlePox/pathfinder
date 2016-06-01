@@ -1,12 +1,14 @@
 import java.util.ArrayList;
 
 class AStarAlg extends Alg {
+  SimpleAStar astar;
   BinaryHeap open;
   ArrayList<Integer> closed = new ArrayList<Integer>();
   ArrayList<Integer> path = new ArrayList<Integer>();
 
   AStarAlg(Board board) {
     this.board = board;
+    astar = new SimpleAStar(board);
   }
 
   void init() {
@@ -24,10 +26,13 @@ class AStarAlg extends Alg {
   void go() {  //really listen() for manual keyboard controls
     if (run) {
       if (!travel) {
+        //int t = millis();
         calc();
+        //System.out.println("A-Star " + (millis()-t));
       }
       if (pathExists) {
         travel(closed);
+        eunits = steps;
       }
     }
   }
@@ -36,6 +41,7 @@ class AStarAlg extends Alg {
     int bNode = board.start.id;
     open.add(bNode, bNode);
     for (int z = 0; z < board.x*board.y; z++) {
+      int preNode = bNode;
       bNode = open.getMQ();
       if (bNode == -1) break;
       board.grab(bNode).open = false;
@@ -135,10 +141,10 @@ class SimpleAStar {
   ArrayList<Integer> closed = new ArrayList<Integer>();
   ArrayList<Integer> path = new ArrayList<Integer>();
   
-  SimpleAStar(Board board) {
-    this.board = board;
+  SimpleAStar(Board b) {
+    this.board = b;
   }
-
+  
   ArrayList<Integer> calc(Cell start, Cell end) {
     open = new BinaryHeap(board);
     open.end = end.id;
