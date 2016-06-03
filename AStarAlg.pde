@@ -32,7 +32,7 @@ class AStarAlg extends Alg {
       }
       if (pathExists) {
         travel(closed);
-        eunits = steps;
+        eunits = steps*6;
       }
     }
   }

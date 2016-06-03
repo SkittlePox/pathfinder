@@ -1,7 +1,7 @@
 abstract class Alg {
   Board board;
-  int x, y, endX, endY, steps = 0, visited = 1, iterator = 1, time = millis();
-  double eunits = 0;
+  int id = -1, x, y, endX, endY, steps = 0, visited = 1, iterator = 1, time = millis(), eunits = 0, travelTime = 20;
+  int vision = -1, speed = -1, cognition = -1;
   boolean run = false, pause = false, travel = false, pathExists;
 
   void play() {
@@ -42,7 +42,7 @@ abstract class Alg {
   }
   
   void travel(ArrayList<Integer> pathF) {
-    if (iterator < pathF.size() && millis() > time + 20) {  //makes sure iterator doesn't go out of bounds and that x ms has passed
+    if (iterator < pathF.size() && millis() > time + travelTime) {  //makes sure iterator doesn't go out of bounds and that x ms has passed
       time = millis();
       x = board.grab(pathF.get(iterator)).xi;  //Updates coordinate values
       y = board.grab(pathF.get(iterator)).yi;
@@ -60,7 +60,7 @@ abstract class Alg {
       steps++;  //Iterates
       iterator++;
     }
-    if (iterator == pathF.size() && millis() > time + 20) {
+    if (iterator == pathF.size() && millis() > time + travelTime) {
       for (int i = 0; i < iterator; i++) {
         board.grab(pathF.get(i)).sealed = true;
         board.grab(pathF.get(i)).display();

@@ -241,7 +241,7 @@ class Menu {
     
     if (mouseX > x + padding && mouseX < x + sizeX && mouseY > y + bh*7 + padding*8 && mouseY < y + (bh + padding) * 8) { //Eleventh Button
       drawB11(true);
-      if (mousePressed && millis() > time + 500) {
+      if (mousePressed && millis() > time + 250) {
         time = millis();
         if (handler.main.isRunning()) {
           board.clearAllExceptWalls();

@@ -112,6 +112,7 @@ class Board {
           grid[i][x].on = false;
           grid[i][x].parent = -1;
           grid[i][x].sealed = false;
+          grid[i][x].marked = false;
         }
       }
     }
